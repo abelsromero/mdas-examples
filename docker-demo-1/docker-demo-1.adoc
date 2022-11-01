@@ -1,0 +1,110 @@
+= Docker demo 1
+// 7 min
+
+First Docker example to showcase basic features like:
+
+* App deployment from public repositories
+* App management
+* Difference between image & container
+
+
+== Demo
+
+. Pull public image.
+
+ $ docker pull nginx
++
+Expected: Download of 'latest' image starts, ending with message.
++
+----
+ Status: Downloaded newer image for nginx:latest
+ docker.io/library/nginx:latest
+----
+
+. Create a container from previous image.
+
+ $ docker run -p8080:80 --detach nginx
++
+Expected: Nginx instance starts.
+Browse to http://localhost:8080/ to see nginx's welcome page.
++
+NOTE: Only in Linux the Nginx process is directly visible.
+Other OS like MacOs have a virtualization layer that hides it.
+
+. List running containers.
+
+ $ docker ps
++
+Expected: One container is listed.
+We can see the 'CONTAINER ID', 'IMAGE' and 'COMMAND' details amongst others.
+Note the ID will be used in later steps.
+
+. Display container logs.
+
+ $ docker logs {container_id}
++
+Expected: Nginx logs appear.
+Pay attention to timestamps for later.
+
+. Stop container.
+
+ $ docker stop {container_id}
++
+Expected: Container is not running.
+We can't access http://localhost:8080/, not does it appear with `docker ps`.
+
+. Restart container (use `ps -a`) to list 'all' containers.
+
+ $ docker ps -a
+ $ docker start {container_id}
++
+Expected: The same container is running.
+`logs` now displays a new set of traces on top of the previous ones.
+We can access http://localhost:8080/ again.
+
+. Create a second container: pull and inspect image to see port to map.
+
+ $ docker pull tomcat
+ $ docker image inspect tomcat
+ $ docker run -p8090:8080 --detach tomcat
++
+Expected: A Tomcat is running.
+Browse to http://localhost:8090/ to see Tomcat error page.
+We can still access Nginx on http://localhost:8080/.
+
+. List containers
+
+ $ docker ps
++
+Expected: We see both containers with different IDs and ports.
+
+. Display container(s) statistics.
+
+ $ docker stats
+
+Expected: Information about CPU and Memory usage for both containers is show.
+Use something like `wrk` to generate load on one of them and see CPU load.
+
+. List images
+
+ $ docker images
++
+Expected: We see the images.
+Obviously IDs and CREATED do not match with the containers' ones.
+
+. Try to delete an image
+
+ $ docker rmi tomcat
++
+Expected: An error message pointing to the image being used is show.
+The message even shows the ID of the container.
+
+. Stop & delete containers
+
+ $ docker stop {container_id}
+ $ docker rm {container_id}
+
+. Clean up images
+
+ $ docker rmi tomcat
+ $ docker rmi nginx
