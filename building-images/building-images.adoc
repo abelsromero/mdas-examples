@@ -1,0 +1,97 @@
+= Building images
+
+Simple examples of how to build docker images.
+
+It requires https://github.com/wagoodman/dive[dive] tool to further explore the generated images.
+
+== Manual (Dockerfile)
+
+This directory contains a simple example of a Docker image build with a 'Dockerfile'.
+
+. Build image
+
+ $ docker build -t hello-app .
++
+Expected: Image is build locally succesfully.
+
+. List images
+
+ $ docker images
+
+Expected: Image `hello-app:latest` is present.
+
+. Explore image with dive
+
+ $ dive hello-app
+
+Expected: Each step of the Dockerfile has become a layer.
+Specifically, the last one contains the script copy.
+
+. Run the image
+
+ $ docker run --rm hello-app
+
+Expected: Execution fails because and argument is required.
+
+NOTE: Use `--rm` to prevent saving the container afterwards.
+
+. Run the image with an argument
+
+ $ docker run --rm hello-app myself
+
+Expected: Container runs successfully with output `Hello myself!`.
+
+=== Notes
+
+* To pass arguments, ENTRYPOINT must use array syntax.
+* Can't use ARG or ENV in ENTRYPOINT.
+
+== From source
+
+`demo-app-java` directory contains a simple example of a Docker image build automatically from source
+using https://github.com/GoogleContainerTools/jib[Jib] and https://paketo.io/[Paketo Buildpacks].
+
+=== JIB
+
+Inside `demo-app-java` directory.
+
+Enabling JIB only requires adding the proper gradle plugin `com.google.cloud.tools.jib`.
+
+. Build image locally using project sources and build configurations
+
+ ./gradlew jibDockerBuild
++
+WARNING: Using `./gradlew jib --image=...` (without Docker daemon) fails because it pushed on the same step.
++
+Expected: Image `demo-app-java:0.0.1-SNAPSHOT` is built.
+
+. Explore image with dive
+
+ $ dive demo-app-java:0.0.1-SNAPSHOT
+
+Expected: Project has been built and packaged as image automatically.
+The different layers show good practices like:
+* OS Update (`apt-get update`)
+* Dependencies, resources and app as independent layer (in this order)
+
+=== Paketo Buildpack
+
+Inside `demo-app-java` directory.
+
+Buildpacks can be run using CLI or through Spring Boot Gradle support.
+This shows the latest for being simple and not requiring extra installations.
+
+ ./gradlew bootBuildImage
+
+Expected: Image `demo-app-java:0.0.1-SNAPSHOT` is built.
+Process output displays the different components involved as well as base image.
+
+. Explore image with dive
+
+ $ dive demo-app-java:0.0.1-SNAPSHOT
+
+Expected: Project has been built and packaged as image automatically.
+The different layers show good practices like:
+* Additional metadata for inventory purposes
+* Dependencies, resources and app as independent layer (in this order)
+* Additional Spring framework specific tuning
