@@ -74,7 +74,7 @@ The different layers show good practices like:
 * OS Update (`apt-get update`)
 * Dependencies, resources and app as independent layer (in this order)
 
-=== Paketo Buildpack
+=== Paketo Buildpacks (Gradle)
 
 Inside `demo-app-java` directory.
 
@@ -95,3 +95,21 @@ The different layers show good practices like:
 * Additional metadata for inventory purposes
 * Dependencies, resources and app as independent layer (in this order)
 * Additional Spring framework specific tuning
+
+=== Paketo Buildpacks (CLI)
+
+Inside `demo-app-java` directory.
+
+Buildpacks can be run using CLI or through Spring Boot Gradle support.
+This shows the first to observe the differences in defaults.
+Requires installing https://buildpacks.io/docs/tools/pack/[Pack cli tool].
+
+ $ pack build my-image --builder paketobuildpacks/builder:base
+
+Expected: `my-image:latest` image is generated.
+Observation of the output shows:
+
+* Output shows same steps as previous build with Gradle.
+* Some noteworthy differences:
+    ** Image tag is not obtained from source
+    ** BP_JVM_VERSION is 11, not 17
