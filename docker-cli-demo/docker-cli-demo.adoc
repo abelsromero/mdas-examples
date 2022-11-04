@@ -1,4 +1,4 @@
-= Docker demo 1
+= Docker CLI demo
 // 7 min
 
 First Docker example to showcase basic features like:
