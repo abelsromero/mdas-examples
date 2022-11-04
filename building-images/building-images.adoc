@@ -2,7 +2,7 @@
 
 Simple examples of how to build docker images.
 
-It requires https://github.com/wagoodman/dive[dive] tool to further explore the generated images.
+IMPORTANT: It requires https://github.com/wagoodman/dive[dive] tool to further explore the generated images.
 
 == Manual (Dockerfile)
 
