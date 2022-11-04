@@ -17,28 +17,28 @@ Expected: Image is build locally succesfully.
 . List images
 
  $ docker images
-
++
 Expected: Image `hello-app:latest` is present.
 
 . Explore image with dive
 
  $ dive hello-app
-
++
 Expected: Each step of the Dockerfile has become a layer.
 Specifically, the last one contains the script copy.
 
 . Run the image
 
  $ docker run --rm hello-app
-
++
 Expected: Execution fails because and argument is required.
-
++
 NOTE: Use `--rm` to prevent saving the container afterwards.
 
 . Run the image with an argument
 
  $ docker run --rm hello-app myself
-
++
 Expected: Container runs successfully with output `Hello myself!`.
 
 === Notes

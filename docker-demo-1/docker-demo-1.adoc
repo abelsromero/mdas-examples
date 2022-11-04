@@ -81,7 +81,7 @@ Expected: We see both containers with different IDs and ports.
 . Display container(s) statistics.
 
  $ docker stats
-
++
 Expected: Information about CPU and Memory usage for both containers is show.
 Use something like `wrk` to generate load on one of them and see CPU load.
 
