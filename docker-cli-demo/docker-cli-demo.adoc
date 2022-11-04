@@ -1,12 +1,15 @@
 = Docker CLI demo
 // 7 min
 
-First Docker example to showcase basic features like:
+First Docker example to showcase basic commands and features like:
 
 * App deployment from public repositories
 * App management
 * Difference between image & container
 
+IMPORTANT: Requires installing Docker engine.
+Instructions for specifics OS in https://docs.docker.com/engine/install/.
+// Not tested in Apple M1, M2 chips.
 
 == Demo
 
