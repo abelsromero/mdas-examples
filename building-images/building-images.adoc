@@ -53,6 +53,8 @@ using https://github.com/GoogleContainerTools/jib[Jib] and https://paketo.io/[Pa
 
 === JIB
 
+IMPORTANT: It requires Java 17 JDK installed and available in the path.
+
 Inside `demo-app-java` directory.
 
 Enabling JIB only requires adding the proper gradle plugin `com.google.cloud.tools.jib`.
@@ -72,9 +74,15 @@ Expected: Image `demo-app-java:0.0.1-SNAPSHOT` is built.
 Expected: Project has been built and packaged as image automatically.
 The different layers show good practices like:
 * OS Update (`apt-get update`)
-* Dependencies, resources and app as independent layer (in this order)
+* Dependencies, resources (configuration files) and app as independent layer (in this order)
+
+However, there are also some good practices not applied:
+* Container runs as root.
+Run `docker exec -it {container_id} bash` and then `whoami` to connect to the running container and see the user being used.
 
 === Paketo Buildpacks (Gradle)
+
+IMPORTANT: It requires Java 17 JDK installed and available in the path.
 
 Inside `demo-app-java` directory.
 
@@ -92,17 +100,24 @@ Process output displays the different components involved as well as base image.
 
 Expected: Project has been built and packaged as image automatically.
 The different layers show good practices like:
-* Additional metadata for inventory purposes
-* Dependencies, resources and app as independent layer (in this order)
-* Additional Spring framework specific tuning
+
+* Dependencies, resources (configuration files) and app as independent layer (in this order)
+* Additional Spring framework specific tuning (only relevant for Java and Kubernetes integration).
+`spring-cloud-bindings` component is added for better Kubernetes integration.
+* Additional metadata for inventory purposes.
+See files under `layers/sbom` ("sbom" stands for "Software Bill of Materials")
+* Does NOT run as root user.
+User 'cnb' (acronym for Cloud Native Buildpacks) is created and set automatically.
 
 === Paketo Buildpacks (CLI)
 
 Inside `demo-app-java` directory.
 
+IMPORTANT: Requires installing https://buildpacks.io/docs/tools/pack/[Pack cli tool].
+
 Buildpacks can be run using CLI or through Spring Boot Gradle support.
-This shows the first to observe the differences in defaults.
-Requires installing https://buildpacks.io/docs/tools/pack/[Pack cli tool].
+This shows the first case (cli) to present the differences in defaults between the two options.
+Build integration (with Gradle) provides a tighter integration which in turn translates into a more optimized image.
 
  $ pack build my-image --builder paketobuildpacks/builder:base
 
@@ -111,5 +126,5 @@ Observation of the output shows:
 
 * Output shows same steps as previous build with Gradle.
 * Some noteworthy differences:
-    ** Image tag is not obtained from source
-    ** BP_JVM_VERSION is 11, not 17
+    ** Image tag is not obtained from source. Because the CLI is not able to read the `sourceCompatibility` configuration in `build.gradle` file.
+    ** BP_JVM_VERSION is 11, not 17. Because the CLI is not able to read the `version` configuration in `build.gradle` file.
