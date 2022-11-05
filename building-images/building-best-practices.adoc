@@ -1,0 +1,48 @@
+= Building images best practices
+
+Examples about good practices when building images.
+
+IMPORTANT: It requires https://github.com/wagoodman/dive[dive] tool to further explore the generated images.
+
+== Update your OS layer before anything else
+
+Exact commands depend on Linux distribution.
+Here are example for most popular ones, Ubuntu (Debian based) and Alpine:
+
+* Ubuntu
++
+----
+RUN apt -qy update \
+	&& apt install curl \
+	&& apt clean
+----
+
+* Alpine based
+----
+RUN apk update \
+	&& apk upgrde \
+	&& apk add curlç
+----
+
+== Use `&& operand to group configuration layers
+
+Use `&&` operand to run commands together and create a single layer.
+
+.Helm installation example
+----
+ARG HELM_VERSION="3.10.1"
+
+RUN curl -L "https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz" | tar xz \
+  && chmod u+x linux-amd64/helm && mv linux-amd64/helm /usr/local/bin
+----
+
+== Preventing use of root user
+
+Create your own user and set it as the running one.
+
+----
+RUN useradd -ms /bin/sh my-user
+USER my-user
+----
+
+
