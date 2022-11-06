@@ -12,7 +12,7 @@ This directory contains a simple example of a Docker image build with a 'Dockerf
 
  $ docker build -t hello-app .
 +
-Expected: Image is build locally succesfully.
+Expected: Image is build locally successfully.
 
 . List images
 

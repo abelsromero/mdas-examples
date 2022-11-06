@@ -2,4 +2,4 @@
 
 readonly WHO="${1:?must be set}"
 
-echo "Hello $1!"
+echo "Hello $WHO!"
