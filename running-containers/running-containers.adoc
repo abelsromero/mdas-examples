@@ -1,0 +1,108 @@
+= Running containers
+
+Examples of running a Docker image with different options.
+
+Each example is under its own directory and contains sources and dockerfile.
+Build each one of the images from within the respective directory with
+
+ $ docker build -t hello-app .
+
+== Passing environment variables
+
+Example under `with-env-vars` expands the one in `building-images` adding the option to override argument 1 with the environment variable `ALIAS`.
+
+. Validate behavior from `building-images` example still applies.
+
+ $ docker run --rm hello-app
++
+Expected: Execution fails because and argument is required.
+
+ $ docker run --rm hello-app myself
++
+Expected: Container runs successfully with output `Hello myself!`.
+
+. Let's bypass command argument validation with the `ALIAS` environment variable.
+
+ $ docker run --env ALIAS='Old Ben' hello-app
++
+Expected: Container runs successfully with output `Hello Old Ben...I think you are hiding something...`.
+
+NOTE: Observe the variable is set as empty in the Dockerfile, this line could be omitted but is recommended for documentation.
+
+== Using a Bind Volume
+
+Example under `with-volumes` makes it so the name is read from a file.
+
+. Run container without options.
+
+ $ docker run --rm hello-app
++
+Expected: Execution fails because configuration file is not present.
+
+. Use a "bind mount" to add the required file.
+Replace content in 'who' file to customize the response.
+
+ $ docker run --rm -v "$(pwd)/who:/app/who" hello-app
++
+TIP: Use https://en.wikipedia.org/wiki/Pwd[pwd] to build the full path automatically, preventing accidental mistakes.
++
+Expected: Container runs successfully with output `Hello myself!`.
+Observe the path of the file is configured at image build time in the Dockerfile.
+
+. Use a "bind mount" to add the required file to a new location,
+and override the file's location environment variable with `--env`.
+
+ $ docker run --rm --env 'WHO_PATH=/tmp/who' -v "$(pwd)/who:/tmp/who" hello-app
++
+Expected: Container runs successfully with output `Hello myself!`.
+See we are mounting the file under `/tmp` now, not `/app`.
+
+== Using a Volume Mount
+
+We are going to reuse `with-volume-mount` but loading the configuration file from a persistent volume.
+
+. First, we need to create a volume
+
+ $ docker volume create my-volume
++
+Expected: volume has been created.
+Use `docker volume ls` to see it and check the driver is `local`.
+
+. Run 'hello-app' with the new volume.
++
+NOTE: We need to set a different path avoid shadowing the `/app` path with the entrypoint script.
+
+ $ docker run --rm --env WHO_PATH="/app-config/who" -v my-volume:/app-config hello-app
++
+Expected: Execution fails because configuration file is not present in the volume.
+
+. So, let's add the configuration file to the volume.
+However, one cannot copy files into a volume directly, we must mount it into a running container to access it.
+We can run a temporal lightweight image like 'alpine' for that purpose.
+
+ $ docker run --rm -it --entrypoint sh alpine
+ $ docker cp who {container_id}:/app
++
+See that we run with `--rm` because the container is temporal.
+And we add `-it --entrypoint sh` just to prevent it from finishing, having a terminal opened is handy to validate data too.
+
+. Validate data in the container.
+From the open terminal, run
+
+ $ mount | grep app
++
+Expected: A mount point mapped to `/app` path is listed.
+
+ $ cat /app/who
++
+Expected: Content of the file matching the original file is shown.
+
+. Exit the alpine container with `exit`.
+
+. Run the 'hello-app' again now that the volume contains the espected file.
+
+ $ docker run --rm --env WHO_PATH="/app-config/who" -v my-volume:/app-config hello-app
++
+Expected: Container runs successfully with output `Hello myself!`.
+We can run it multiple times, and validate that no container is re-used (`docker ps -a`) but the result is always successful.
+That is thanks to the date being persisted in the volume.
