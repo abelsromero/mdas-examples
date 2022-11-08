@@ -20,8 +20,8 @@ RUN apt -qy update \
 * Alpine based
 ----
 RUN apk update \
-	&& apk upgrde \
-	&& apk add curlç
+	&& apk upgrade \
+	&& apk add curl
 ----
 
 == Use `&& operand to group configuration layers
