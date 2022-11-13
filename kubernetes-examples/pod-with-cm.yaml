@@ -1,0 +1,18 @@
+# Runs a pod that prints the environment variables and finishes.
+# Note that k8s will interpret the pod finishing as an error
+# and will restart it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: game-pod
+spec:
+  containers:
+    - name: test-container
+      image: busybox
+      command: [ "/bin/sh", "-c", "env" ]
+      env:
+        - name: GAME_CONFIGURATION
+          valueFrom:
+            configMapKeyRef:
+              name: game-config
+              key: game.properties
