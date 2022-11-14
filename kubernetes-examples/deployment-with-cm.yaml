@@ -36,7 +36,22 @@ spec:
           volumeMounts:
             - name: game-config-volume
               mountPath: /etc/config
+          ports:
+            - containerPort: 80
       volumes:
         - name: game-config-volume
           configMap:
             name: game-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: nginx
