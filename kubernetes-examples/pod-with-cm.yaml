@@ -1,6 +1,6 @@
 # Runs a pod that prints the environment variables and finishes.
-# Note that k8s will interpret the pod finishing as an error
-# and will restart it.
+# Note that unless 'restartPolicy: Never' is set, k8s will interpret
+# the pod finishing as an error and will restart it.
 apiVersion: v1
 kind: Pod
 metadata:
@@ -16,3 +16,4 @@ spec:
             configMapKeyRef:
               name: game-config
               key: game.properties
+  restartPolicy: Never
