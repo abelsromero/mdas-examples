@@ -33,8 +33,15 @@ spec:
             - configMapRef:
                 name: ui-config
                 optional: false
+          volumeMounts:
+            - name: game-config-volume
+              mountPath: /etc/config
           ports:
             - containerPort: 80
+      volumes:
+        - name: game-config-volume
+          configMap:
+            name: game-config
 ---
 apiVersion: v1
 kind: Service
