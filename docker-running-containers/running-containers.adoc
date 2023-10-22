@@ -11,6 +11,14 @@ Build each one of the images from within the respective directory with
 
 Example under `with-env-vars` expands the one in `building-images` adding the option to override argument 1 with the environment variable `ALIAS`.
 
+. Place the terminal at `with-env-vars` sub-folder.
+
+ $ cd running-containers/with-env-vars
+
+. Build the image
+
+ $ docker build -t hello-app .
+
 . Validate behavior from `building-images` example still applies.
 
  $ docker run --rm hello-app
@@ -32,6 +40,14 @@ NOTE: Observe the variable is set as empty in the Dockerfile, this line could be
 == Using a Bind Volume
 
 Example under `with-volumes` makes it so the name is read from a file.
+
+. Place the terminal at `with-volumes` sub-folder.
+
+ $ cd running-containers/with-volumes
+
+. Build the image
+
+ $ docker build -t hello-app .
 
 . Run container without options.
 
@@ -80,22 +96,25 @@ Expected: Execution fails because configuration file is not present in the volum
 However, one cannot copy files into a volume directly, we must mount it into a running container to access it.
 We can run a temporal lightweight image like 'alpine' for that purpose.
 
- $ docker run --rm -it --entrypoint sh alpine
- $ docker cp who {container_id}:/app
+ $ docker run --rm -it -v my-volume:/data --entrypoint sh alpine
 +
-See that we run with `--rm` because the container is temporal.
+Edit the content of `who` file and copy it to the volume.
+
+ $ docker cp who {container_id}:/data
++
+NOTE: See that we run with `--rm` because the container is temporal.
 And we add `-it --entrypoint sh` just to prevent it from finishing, having a terminal opened is handy to validate data too.
 
 . Validate data in the container.
 From the open terminal, run
 
- $ mount | grep app
+ $ mount | grep data
 +
-Expected: A mount point mapped to `/app` path is listed.
+Expected: A mount point mapped to `/data` path is listed.
 
- $ cat /app/who
+ $ cat /data/who
 +
-Expected: Content of the file matching the original file is shown.
+Expected: Content of the file matching the updated file is shown.
 
 . Exit the alpine container with `exit`.
 
