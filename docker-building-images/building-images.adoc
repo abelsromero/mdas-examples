@@ -8,6 +8,10 @@ IMPORTANT: It requires https://github.com/wagoodman/dive[dive] tool to further e
 
 This directory contains a simple example of a Docker image build with a 'Dockerfile'.
 
+. Place the terminal at `docker-building-images` folder.
+
+ $ cd docker-building-images
+
 . Build image
 
  $ docker build -t hello-app .
@@ -22,10 +26,20 @@ Expected: Image `hello-app:latest` is present.
 
 . Explore image with dive
 
- $ dive hello-app
+ $ dive {image-name}
 +
 Expected: Each step of the Dockerfile has become a layer.
 Specifically, the last one contains the script copy.
++
+[TIP]
+====
+Dive shortcuts:
+
+* Tab: change between Layers (left) & Contents (right) panels.
+* In Layers panel, use Up & Down: select layer. Modified files are highlighted on the Contents panel.
+* In Contents panel, Ctrl+Space: expand/fold tree.
+* q: exits Dive.
+====
 
 . Run the image
 
@@ -33,7 +47,7 @@ Specifically, the last one contains the script copy.
 +
 Expected: Execution fails because and argument is required.
 +
-NOTE: Use `--rm` to prevent saving the container afterwards.
+NOTE: Use `--rm` to prevent saving the container afterward.
 
 . Run the image with an argument
 
@@ -55,27 +69,31 @@ using https://github.com/GoogleContainerTools/jib[Jib] and https://paketo.io/[Pa
 
 IMPORTANT: It requires Java 17 JDK installed and available in the path.
 
-Inside `demo-app-java` directory.
+. Place the terminal at `demo-app-java` folder.
 
+ $ cd demo-app-java
++
 Enabling JIB only requires adding the proper gradle plugin `com.google.cloud.tools.jib`.
 
 . Build image locally using project sources and build configurations
 
  ./gradlew jibDockerBuild
 +
-WARNING: Using `./gradlew jib --image=...` (without Docker daemon) fails because it pushed on the same step.
+WARNING: Using `./gradlew jib --image=...` (without Docker daemon) fails because it's pushed on the same step.
 +
 Expected: Image `demo-app-java:0.0.1-SNAPSHOT` is built.
 
 . Explore image with dive
 
  $ dive demo-app-java:0.0.1-SNAPSHOT
-
++
 Expected: Project has been built and packaged as image automatically.
 The different layers show good practices like:
+
 * OS Update (`apt-get update`)
 * Dependencies, resources (configuration files) and app as independent layer (in this order)
 
++
 However, there are also some good practices not applied:
 * Container runs as root.
 Run `docker exec -it {container_id} bash` and then `whoami` to connect to the running container and see the user being used.
@@ -125,6 +143,3 @@ Expected: `my-image:latest` image is generated.
 Observation of the output shows:
 
 * Output shows same steps as previous build with Gradle.
-* Some noteworthy differences:
-    ** Image tag is not obtained from source. Because the CLI is not able to read the `sourceCompatibility` configuration in `build.gradle` file.
-    ** BP_JVM_VERSION is 11, not 17. Because the CLI is not able to read the `version` configuration in `build.gradle` file.
